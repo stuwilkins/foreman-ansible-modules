@@ -583,7 +583,6 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
 
             # Set ansible roles
             if self.get_option('want_ansible_roles'):
-                print("Want ansible roles report api")
                 ansible_roles = self._get_ansible_roles(host['id'])
                 self.inventory.set_variable(host_name, 'foreman_roles', ansible_roles)
 
@@ -651,14 +650,14 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
                             self.display.warning("Could not set hostvar %s to '%s' for the '%s' host, skipping:  %s" %
                                                  (k, to_native(v), host, to_native(e)))
 
-            # set host vars from facts
-            if self.get_option('want_facts'):
-                self.inventory.set_variable(host_name, 'foreman_facts', self._get_facts(host))
-
             # Set ansible roles
             if self.get_option('want_ansible_roles'):
                 ansible_roles = self._get_ansible_roles(host['id'])
                 self.inventory.set_variable(host_name, 'foreman_roles', ansible_roles)
+
+            # set host vars from facts
+            if self.get_option('want_facts'):
+                self.inventory.set_variable(host_name, 'foreman_facts', self._get_facts(host))
 
             # create group for host collections
             if self.get_option('want_hostcollections'):
