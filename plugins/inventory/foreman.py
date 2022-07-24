@@ -71,6 +71,10 @@ DOCUMENTATION = '''
         description: Toggle, if true the plugin will create Ansible groups for host collections
         type: boolean
         default: False
+      want_ansible_roles:
+        description: Toggle, if true the plugin will retrieve the ansible roles as a host var
+        type: boolean
+        default: False
       legacy_hostvars:
         description:
             - Toggle, if true the plugin will build legacy hostvars present in the foreman script
@@ -348,6 +352,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
         self.want_content_facet_attributes = report_options.get('want_content_facet_attributes', self.get_option('want_content_facet_attributes'))
         self.want_params = self.get_option('want_params')
         self.want_facts = self.get_option('want_facts')
+        self.want_ansible_roles = self.get_option('want_ansible_roles')
         self.host_filters = self.get_option('host_filters')
 
         params["Organization"] = options[self.want_organization]
@@ -362,6 +367,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
         params["Smart Proxies"] = options[self.want_smart_proxies]
         params["Content Attributes"] = options[self.want_content_facet_attributes]
         params["Host Parameters"] = options[self.want_params]
+        params["Ansible Roles"] = options[self.want_ansible_roles]
         if self.host_filters:
             params["Hosts"] = self.host_filters
         return params
@@ -567,6 +573,11 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
                         except ValueError as e:
                             self.display.warning("Could not set hostvar %s to '%s' for the '%s' host, skipping:  %s" %
                                                  (k, to_native(v), host, to_native(e)))
+
+            # Set ansible roles
+            if self.get_option('want_ansible_roles'):
+                print("Want ansible roles")
+
             hostvars = self.inventory.get_host(host_name).get_vars()
             self._set_composite_vars(self.get_option('compose'), hostvars, host_name, strict)
             self._add_host_to_composed_groups(self.get_option('groups'), hostvars, host_name, strict)
