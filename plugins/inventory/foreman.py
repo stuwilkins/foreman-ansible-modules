@@ -574,10 +574,6 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
                             self.display.warning("Could not set hostvar %s to '%s' for the '%s' host, skipping:  %s" %
                                                  (k, to_native(v), host, to_native(e)))
 
-            # Set ansible roles
-            if self.get_option('want_ansible_roles'):
-                print("Want ansible roles")
-
             hostvars = self.inventory.get_host(host_name).get_vars()
             self._set_composite_vars(self.get_option('compose'), hostvars, host_name, strict)
             self._add_host_to_composed_groups(self.get_option('groups'), hostvars, host_name, strict)
@@ -645,6 +641,10 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
             # set host vars from facts
             if self.get_option('want_facts'):
                 self.inventory.set_variable(host_name, 'foreman_facts', self._get_facts(host))
+
+            # Set ansible roles
+            if self.get_option('want_ansible_roles'):
+                print("Want ansible roles")
 
             # create group for host collections
             if self.get_option('want_hostcollections'):
