@@ -334,6 +334,12 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
                 hostvars[vars_prefix + k] = v
         return hostvars
 
+    def _get_ansible_roles(self, hid):
+        """Fetch all ansible roles of the host"""
+        url = "%s/api/v2/hosts/%s/ansible_roles" % (self.foreman_url, hid)
+        ret = self._get_json(url, [404])
+        print(ret)
+
     def _fetch_params(self):
         options = ("no", "yes")
         params = dict()
@@ -577,6 +583,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
             # Set ansible roles
             if self.get_option('want_ansible_roles'):
                 print("Want ansible roles report api")
+                ansible_roles = self._get_ansible_roles(host['id'])
 
             hostvars = self.inventory.get_host(host_name).get_vars()
             self._set_composite_vars(self.get_option('compose'), hostvars, host_name, strict)
@@ -648,6 +655,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable, Constructable):
 
             # Set ansible roles
             if self.get_option('want_ansible_roles'):
+                ansible_roles = self._get_ansible_roles(host['id'])
                 print("Want ansible roles api")
 
             # create group for host collections
